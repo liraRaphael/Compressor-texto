@@ -11,20 +11,6 @@ class Compactador:
     leitura = None # conterá a classe de Arquivo para leitura
     gravacao = None # conterá a classe de Arquivo para gravar 
 
-
-    # faz a ordenação decrescente em bolha
-    def ordenacaoLista(self,lista):    
-
-        for i in range(0,len(lista)):
-            for j in range(0,i):
-                if len(lista[i]) > len(lista[j]):
-                    temp = lista[i]
-                    lista[i] = lista[j]
-                    lista[j] = temp
-
-        return lista
-
-
     # tira os itens repetidos
     def tirarRepeticao(self,quebrar):
         lista = []
@@ -68,10 +54,16 @@ class Compactador:
 
         # varre toda a lista, para a substituição
         for i in range(0,len(lista)):
-            texto = texto.replace(
-                lista[i].encode(),
-                (255).to_bytes(1,Arquivo.BYTEORDER)+(i).to_bytes(2,Arquivo.BYTEORDER)
-            )
+
+            regex = re.compile((r"(?:\b)"+lista[i]+r"(?:\b)").encode())
+            try:
+                texto = re.sub(
+                    regex,
+                    (255).to_bytes(1,Arquivo.BYTEORDER)+(i).to_bytes(2,Arquivo.BYTEORDER),
+                    texto
+                )
+            except:
+                pass
 
         # gera a lista em string
         listaString = ",".join(lista)
@@ -134,7 +126,7 @@ class Compactador:
         # caso o arquivo tenha o tamanho menor que 2 blocos de 4k
         if tamanhoLeitor <= 2 * Arquivo.TAMANHOBUFFER:
             texto = self.leitura.leitura(tamanhoLeitor)
-            lista = self.ordenacaoLista(self.lista(texto))
+            lista = self.lista(texto)
             
             final = self.textoFinal(texto,lista)
             self.gravacao.gravacao(final)
@@ -181,36 +173,6 @@ class Compactador:
             self.gravacao.seek(0,0)
             self.gravacao.gravacao((tamanhoLista).to_bytes(2,Arquivo.BYTEORDER))
 
-            # quantidade de vezes que deve repetir a bolha
-            vezes = math.ceil(self.gravacao.getTamanho()/Arquivo.TAMANHOBUFFER)
-
-            # faz a bolha de ornação, pra deixar os nomes em ordem decrescente
-            for i in range(0,vezes):
-
-                #aponta para depois do cabeçalho
-                self.gravacao.seek(2,0)
-
-                # faz a bolha
-                while self.gravacao.getTamanho() - self.gravacao.ponteiro() > 0:
-                    textoGravador = self.gravacao.leitura(Arquivo.TAMANHOBUFFER*2)
-                    
-                    textoGravador = self.apontaUltimaPalavra(textoGravador,self.gravacao)
-                    lista = self.ordenacaoLista(self.lista(textoGravador))
-                    
-                    
-                    if self.gravacao.ponteiro() > Arquivo.TAMANHOBUFFER*2+2:
-                        self.gravacao.seek(-Arquivo.TAMANHOBUFFER*2,1)
-                    else:
-                        self.gravacao.seek(2,0)
-
-
-                    self.gravacao.gravacao((",".join(lista) + ",").encode())
-                
-                if(self.gravacao.getTamanho() - self.gravacao.ponteiro() > 0 or self.gravacao.ponteiro() < Arquivo.TAMANHOBUFFER*2+2):
-                    self.gravacao.seek(2,0)
-                else:
-                    self.gravacao.seek(-Arquivo.TAMANHOBUFFER,1)
-
             #guarda o endereço da ultima palavra da lista e rebobina o leitor
             enderecoUltimoRrn = self.gravacao.getTamanho()
             self.leitura.seek(0,0)
@@ -244,11 +206,18 @@ class Compactador:
                     # faz a substituição direta no texto
                     for i in range(0,len(lista)):
 
-                        textoLeitor = textoLeitor.replace(
-                            lista[i].encode(),
-                            (255).to_bytes(1,Arquivo.BYTEORDER)+(rrn).to_bytes(2,Arquivo.BYTEORDER)
-                        )
 
+                        regex = re.compile((r"(?:\b)"+lista[i]+r"(?:\b)").encode())
+                        try:
+                            textoLeitor = re.sub(
+                                regex,
+                                (255).to_bytes(1,Arquivo.BYTEORDER)+(rrn).to_bytes(2,Arquivo.BYTEORDER),
+                                textoLeitor
+                            )
+                        except:
+                            pass
+
+                        
                         rrn += 1
                     
                 # aponta para final do gravador e grava o texto
