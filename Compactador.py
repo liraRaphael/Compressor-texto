@@ -51,6 +51,8 @@ class Compactador:
 
     # gera o texto final para arquivos pequenos
     def textoFinal(self,texto,lista,comTexto = True):
+        
+
 
         # varre toda a lista, para a substituição
         for i in range(0,len(lista)):
@@ -75,7 +77,9 @@ class Compactador:
         if comTexto:
             final += texto
 
-        return final 
+        final = final.replace(b"\r\n",b"\n")
+
+        return final
 
 
 
@@ -84,7 +88,7 @@ class Compactador:
 
         # quebra a palavra 
         texto = texto.decode(Arquivo.CODIFICACAO)
-        textoLista = re.sub(u'[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôÂÊÎÔãõÃÕçÇ:]', ' ',texto)
+        textoLista = re.sub(u'[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôÂÊÎÔãõÃÕçÇ]', ' ',texto)
         quebrar = textoLista.split(" ")
 
         if ordenar:
@@ -97,7 +101,7 @@ class Compactador:
     def apontaUltimaPalavra(self,texto,arquivo):
 
         # localiza o ultimo caracter não alfa númerico
-        regex = re.finditer(u'[^a-zA-Z0-9:]', texto.decode(Arquivo.CODIFICACAO)) 
+        regex = re.finditer(u'[^a-zA-Z0-9]', texto.decode(Arquivo.CODIFICACAO)) 
 
         # procura a ultima ocorrência
         ultimaOcorrencia = None
@@ -198,7 +202,8 @@ class Compactador:
                     # lê, aponta para ultima palavra da lista, gera a lista
                     textoGravador = self.gravacao.leitura(tBuffer)
                     textoGravador = self.apontaUltimaPalavra(textoGravador,self.gravacao)
-                    lista = self.lista(textoGravador)                    
+                    lista = self.lista(textoGravador)          
+         
                     
                     # conta quanto da lista já foi feito
                     rrn = 0
@@ -220,6 +225,8 @@ class Compactador:
                         
                         rrn += 1
                     
+                textoLeitor = textoLeitor.replace(b"\r\n",b"\n")
+
                 # aponta para final do gravador e grava o texto
                 self.gravacao.seek(0,2)
                 self.gravacao.gravacao(textoLeitor)

@@ -56,7 +56,7 @@ class Descompactador:
                 lista[i].encode(),
                 
             )
-        
+
         return texto
 
     # descompacta o arquivo
@@ -69,6 +69,8 @@ class Descompactador:
         
         tamanho = self.tamanhoRrn + 3
         texto = self.textoFinal(texto[tamanho:len(texto)],lista)
+
+        texto = texto.decode(Arquivo.CODIFICACAO)
 
         # grava
         self.gravacao.gravacao(texto)

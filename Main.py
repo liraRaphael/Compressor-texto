@@ -25,7 +25,7 @@ else:
         
     elif sys.argv[1] == '-d':
         leitor = Arquivo.Arquivo(caminho,"rb")
-        gravador = Arquivo.Arquivo(caminho[0:len(caminho)-4],"wb")
+        gravador = Arquivo.Arquivo(caminho[0:len(caminho)-4],"w")
 
         Descompactador.Descompactador(leitor,gravador).descompactar()
 
