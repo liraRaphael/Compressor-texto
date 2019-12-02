@@ -49,23 +49,46 @@ class Compactador:
         return origem
 
 
+
     # gera o texto final para arquivos pequenos
     def textoFinal(self,texto,lista,comTexto = True):
         
 
+<<<<<<< HEAD
+        # corrige o bug da exepection
+        bug = []
+=======
+>>>>>>> d71dbafa50a4f4d27d74fe2a3790e980267f1e9b
 
         # varre toda a lista, para a substituição
         for i in range(0,len(lista)):
 
-            regex = re.compile((r"(?:\b)"+lista[i]+r"(?:\b)").encode())
+            regex = re.compile(("(?:\\b)"+lista[i]+"(?:\\b)").encode())
+
             try:
                 texto = re.sub(
                     regex,
                     (255).to_bytes(1,Arquivo.BYTEORDER)+(i).to_bytes(2,Arquivo.BYTEORDER),
                     texto
                 )
+
             except:
-                pass
+               bug.append(i)
+
+        # corrige o bug das impressoes
+        # juro que não é gambiarra
+        if len(bug) > 0:
+            for i in range(0,len(bug)):
+                for j in range(0,i):
+                    if len(lista[bug[i]]) > len(lista[bug[j]]):
+                        temp = bug[i]
+                        bug[i] = bug[j]
+                        bug[j] = temp
+
+            for i in range(0,len(bug)):
+                texto = texto.replace(lista[bug[i]].encode(),(255).to_bytes(1,Arquivo.BYTEORDER)+(bug[i]).to_bytes(2,Arquivo.BYTEORDER))
+            
+
 
         # gera a lista em string
         listaString = ",".join(lista)
@@ -79,6 +102,11 @@ class Compactador:
 
         final = final.replace(b"\r\n",b"\n")
 
+<<<<<<< HEAD
+        
+
+=======
+>>>>>>> d71dbafa50a4f4d27d74fe2a3790e980267f1e9b
         return final
 
 
@@ -213,6 +241,8 @@ class Compactador:
 
 
                         regex = re.compile((r"(?:\b)"+lista[i]+r"(?:\b)").encode())
+
+                        
                         try:
                             textoLeitor = re.sub(
                                 regex,
