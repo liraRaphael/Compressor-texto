@@ -54,11 +54,8 @@ class Compactador:
     def textoFinal(self,texto,lista,comTexto = True):
         
 
-<<<<<<< HEAD
         # corrige o bug da exepection
         bug = []
-=======
->>>>>>> d71dbafa50a4f4d27d74fe2a3790e980267f1e9b
 
         # varre toda a lista, para a substituição
         for i in range(0,len(lista)):
@@ -102,11 +99,8 @@ class Compactador:
 
         final = final.replace(b"\r\n",b"\n")
 
-<<<<<<< HEAD
         
 
-=======
->>>>>>> d71dbafa50a4f4d27d74fe2a3790e980267f1e9b
         return final
 
 
